@@ -280,7 +280,7 @@ Notes:</pre>
             if (input.value === MASTER_CODE) {
                 gate.style.display = 'none';
                 content.classList.remove('hidden-content');
-                localStorage.setItem('acrp_auth', 'true'); // Save login for session
+                sessionStorage.setItem('acrp_auth', 'true');
                 generateCaseId();
                 generateAiRequestId();
             } else {
@@ -295,7 +295,7 @@ Notes:</pre>
             if (e.key === 'Enter') checkAccess();
         });
 
-        if (localStorage.getItem('acrp_auth') === 'true') {
+        if (sessionStorage.getItem('acrp_auth') === 'true') {
             document.getElementById('access-gate').style.display = 'none';
             document.getElementById('main-content').classList.remove('hidden-content');
         }
@@ -362,7 +362,7 @@ Notes:</pre>
         }
 
         window.onload = () => {
-            if (localStorage.getItem('acrp_auth') === 'true') {
+            if (sessionStorage.getItem('acrp_auth') === 'true') {
                 generateCaseId();
                 generateAiRequestId();
             }
