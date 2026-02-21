@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACRP Formats Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        .format-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            transition: all 0.2s ease;
+        }
+
+        .format-card:hover {
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+        }
+
+        pre {
+            font-family: 'JetBrains+Mono', monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            background-color: #3b82f6;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn.copied {
+            background-color: #10b981;
+        }
+
+        .gen-btn {
+            background-color: #475569;
+            transition: background-color 0.2s;
+        }
+        .gen-btn:hover {
+            background-color: #64748b;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Access Gate Styles */
+        #access-gate {
+            position: fixed;
+            inset: 0;
+            background: #0f172a;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .gate-card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .hidden-content {
+            display: none;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- Access Gate -->
+    <div id="access-gate">
+        <div class="gate-card">
+            <div class="mb-6">
+                <div class="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-blue-500/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Staff Access Only</h2>
+                <p class="text-slate-400 text-sm">Please enter the permanent staff code to access the format dashboard.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="password" id="staff-code" placeholder="Enter Access Code" 
+                       class="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-blue-500 transition-colors">
+                <button onclick="checkAccess()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition-colors shadow-lg shadow-blue-900/20">
+                    Authorize Entry
+                </button>
+                <p id="error-msg" class="text-red-400 text-xs font-semibold opacity-0 transition-opacity">Invalid Access Code. Try again.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div id="main-content" class="max-w-5xl mx-auto hidden-content">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-blue-400 mb-2">ACRP Formats Hub</h1>
+            <p class="text-slate-400">Quick-copy dashboard for Discord staff operations.</p>
+            <div class="mt-4 inline-flex items-center gap-2 bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-bold border border-green-500/20 uppercase tracking-widest">
+                <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                Staff Verified
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Staff Activity Check -->
+            <div class="format-card p-6 rounded-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-yellow-400">
+                    Staff Activity Check
+                </h2>
+                <pre id="fmt-staff-activity" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">STAFF ACTIVITY CHECK
+Please respond to this message with the following emoji:
+
+Failure to respond will result in an infraction.
+-# <:verified:1466920929773879431> Approved activity check
+Duration: || Timestamp ||
+<@&1465219399295176942></pre>
+                <button onclick="copyToClipboard('fmt-staff-activity', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy Format
+                </button>
+            </div>
+
+            <!-- Server Activity Check -->
+            <div class="format-card p-6 rounded-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-green-400">
+                    Server Activity Check
+                </h2>
+                <pre id="fmt-server-activity" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">SERVER ACTIVITY CHECK
+Please respond to this message with the following emoji:
+
+Failure to respond as staff will result in an infraction.
+As a regular member, this requirement won’t apply to you. However, we kindly request that you respond to ensure our active presence.
+<:check:1466920929773879431> Approved activity check
+Duration: || Timestamp ||
+<@&1465219399295176942>
+<@&1465219399173800121></pre>
+                <button onclick="copyToClipboard('fmt-server-activity', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy Format
+                </button>
+            </div>
+
+            <!-- Meeting Format -->
+            <div class="format-card p-6 rounded-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-blue-400">
+                    Meeting Format
+                </h2>
+                <pre id="fmt-meeting" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">Meeting Title:
+Date: [Timestamp_Date]
+Time: [Timestamp_Time]
+Meeting Lead:
+Meeting Co-lead:
+Attendees: [Ping]
+Mandatory: [yes/no]</pre>
+                <button onclick="copyToClipboard('fmt-meeting', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy Format
+                </button>
+            </div>
+
+            <!-- AI Request Generator -->
+            <div class="format-card p-6 rounded-xl flex flex-col border-blue-500/30">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-bold text-cyan-400">AI Request Format</h2>
+                    <button onclick="generateAiRequestId()" class="gen-btn text-[10px] px-2 py-1 rounded uppercase font-bold text-white">New ID</button>
+                </div>
+                <pre id="fmt-ai-request" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">Format:
+Priority Request:
+Requester:
+Type: AI Investigation
+Request ID: <span class="ai-id-placeholder text-cyan-400 font-bold">AI-Request-XXXXXXXXX</span>
+Granted by:
+Ping:</pre>
+                <button onclick="copyToClipboard('fmt-ai-request', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy AI Request
+                </button>
+            </div>
+
+            <!-- Combined Investigation Section -->
+            <div class="format-card p-6 rounded-xl flex flex-col md:col-span-2 border-dashed border-red-500/50">
+                <div class="flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4">
+                    <h2 class="text-lg font-bold flex items-center gap-2 text-red-400">
+                        Investigation Thread & Content
+                    </h2>
+                    <div class="flex items-center gap-2 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-700">
+                        <span class="text-xs text-slate-500 uppercase font-bold tracking-wider">Current ID:</span>
+                        <code id="current-case-id" class="text-blue-400 font-mono text-sm">acrpai-XXXXXXXXXXXX</code>
+                        <button onclick="generateCaseId()" class="gen-btn text-[10px] px-2 py-1 rounded uppercase font-bold text-white">Generate New</button>
+                    </div>
+                </div>
+                
+                <pre id="fmt-investigation-combined" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">Case Number <span class="case-id-placeholder text-blue-400 font-bold">acrpai-XXXXXXXXXXXX</span>
+Hello! My Name is (Name) With the (Rank) Team. This investigation/Channel Was Opened Because of (Reason) If You do not respond in 24 Hours. Then you will be Terminated Off the Staff Team.
+
+Case Number: #<span class="case-id-placeholder text-red-400 font-bold">acrpai-XXXXXXXXXXXX</span>
+Date & Time (CST):
+User & Rank:
+Reason:
+Remember that evidence IS needed before opening an investigation</pre>
+                
+                <button onclick="copyToClipboard('fmt-investigation-combined', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2 text-white bg-red-600 hover:bg-red-500 transition-colors">
+                    Copy Investigation Format
+                </button>
+            </div>
+
+            <!-- Blacklisted User -->
+            <div class="format-card p-6 rounded-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-zinc-400">
+                    Blacklisted User
+                </h2>
+                <pre id="fmt-blacklist-user" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">Blacklisted User Format:
+Discord ID:
+Discord User:
+Roblox User:
+Roblox ID:
+How Long:
+Reason:</pre>
+                <button onclick="copyToClipboard('fmt-blacklist-user', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy Format
+                </button>
+            </div>
+
+            <!-- Staff App -->
+            <div class="format-card p-6 rounded-xl flex flex-col">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2 text-indigo-400">
+                    Staff App Results
+                </h2>
+                <pre id="fmt-staff-app" class="bg-slate-900/50 p-4 rounded-lg text-sm text-slate-300 mb-4 flex-grow">Format:
+Staff Application (User)
+Fail/Pass:
+Notes:</pre>
+                <button onclick="copyToClipboard('fmt-staff-app', this)" class="copy-btn w-full py-2 rounded-lg font-semibold flex items-center justify-center gap-2">
+                    Copy Format
+                </button>
+            </div>
+
+        </div>
+
+        <footer class="mt-12 mb-8 text-center text-slate-500 text-sm">
+            ACRP Administrative Tools &copy; 2024
+        </footer>
+    </div>
+
+    <div id="toast" class="toast font-semibold text-white">
+        Format Copied!
+    </div>
+
+    <script>
+        // --- SECURITY LOGIC ---
+        const MASTER_CODE = "ACRP-STAFF-2026";
+
+        function checkAccess() {
+            const input = document.getElementById('staff-code');
+            const error = document.getElementById('error-msg');
+            const gate = document.getElementById('access-gate');
+            const content = document.getElementById('main-content');
+
+            if (input.value === MASTER_CODE) {
+                gate.style.display = 'none';
+                content.classList.remove('hidden-content');
+                localStorage.setItem('acrp_auth', 'true'); // Save login for session
+                generateCaseId();
+                generateAiRequestId();
+            } else {
+                error.style.opacity = '1';
+                input.value = '';
+                input.focus();
+                setTimeout(() => { error.style.opacity = '0'; }, 3000);
+            }
+        }
+
+        document.getElementById('staff-code').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkAccess();
+        });
+
+        if (localStorage.getItem('acrp_auth') === 'true') {
+            document.getElementById('access-gate').style.display = 'none';
+            document.getElementById('main-content').classList.remove('hidden-content');
+        }
+
+        // --- GENERATOR LOGIC ---
+        function generateCaseId() {
+            const chars = '0123456789ABCDEF';
+            let result = '';
+            for (let i = 0; i < 12; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            const fullId = `acrpai-${result}`;
+            const displayId = document.getElementById('current-case-id');
+            if(displayId) displayId.innerText = fullId;
+            const placeholders = document.querySelectorAll('.case-id-placeholder');
+            placeholders.forEach(el => el.innerText = fullId);
+        }
+
+        function generateAiRequestId() {
+            const chars = '0123456789ABCDEF';
+            let result = '';
+            for (let i = 0; i < 9; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            const fullId = `AI-Request-${result}`;
+            const placeholders = document.querySelectorAll('.ai-id-placeholder');
+            placeholders.forEach(el => el.innerText = fullId);
+        }
+
+        // --- CLIPBOARD LOGIC ---
+        function copyToClipboard(id, btn) {
+            const text = document.getElementById(id).innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast();
+                
+                const originalText = btn.innerHTML;
+                btn.classList.add('copied');
+                btn.innerHTML = '✓ Copied to Clipboard';
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    btn.innerHTML = originalText;
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Copy failed', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        window.onload = () => {
+            if (localStorage.getItem('acrp_auth') === 'true') {
+                generateCaseId();
+                generateAiRequestId();
+            }
+        };
+    </script>
+</body>
+</html>
